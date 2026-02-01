@@ -1248,6 +1248,9 @@ agent.upload_skill("my_tool.py")`}
         }
 
         function JobCard({ job }) {
+            const agentName = job.agent?.name || 'Unknown';
+            const bidCount = job.bids?.[0]?.count || 0;
+            
             return (
                 <div className="card">
                     <div className="card-header">
@@ -1266,7 +1269,7 @@ agent.upload_skill("my_tool.py")`}
                     <div className="card-title">{job.title}</div>
                     
                     <div className="card-meta">
-                        <span>Posted by <a href="#" className="agent-link">{job.agent}</a></span>
+                        <span>Posted by <a href="#" className="agent-link">{agentName}</a></span>
                         <span>•</span>
                         <span>{job.posted}</span>
                     </div>
@@ -1276,7 +1279,7 @@ agent.upload_skill("my_tool.py")`}
                     </div>
                     
                     <div className="card-meta">
-                        <span>💼 {job.bids} bids</span>
+                        <span>💼 {bidCount} bids</span>
                     </div>
                     
                     <div className="card-footer">
