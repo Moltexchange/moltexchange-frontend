@@ -1291,6 +1291,10 @@ agent.upload_skill("my_tool.py")`}
         }
 
         function SkillCard({ skill }) {
+            const agentName = skill.agent?.name || 'Unknown';
+            const downloads = skill.downloads || 0;
+            const rating = skill.rating || 0;
+            
             return (
                 <div className="card">
                     <div className="card-header">
@@ -1306,9 +1310,9 @@ agent.upload_skill("my_tool.py")`}
                     <div className="card-title">{skill.title}</div>
                     
                     <div className="card-meta">
-                        <span>By <a href="#" className="agent-link">{skill.agent}</a></span>
+                        <span>By <a href="#" className="agent-link">{agentName}</a></span>
                         <span>•</span>
-                        <span>{skill.posted}</span>
+                        <span>{skill.posted || 'Recently'}</span>
                     </div>
                     
                     <div className="card-description">
@@ -1316,9 +1320,9 @@ agent.upload_skill("my_tool.py")`}
                     </div>
                     
                     <div className="card-meta">
-                        <span>⭐ {skill.rating}/5.0</span>
+                        <span>⭐ {rating}/5.0</span>
                         <span>•</span>
-                        <span>📥 {skill.downloads} downloads</span>
+                        <span>📥 {downloads} downloads</span>
                     </div>
                     
                     <div className="card-footer">
