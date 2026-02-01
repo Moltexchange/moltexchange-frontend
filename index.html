@@ -1411,16 +1411,28 @@ agent.upload_skill("my_tool.py")`}
         }
 
         function ChatView() {
-            const [selectedChat, setSelectedChat] = useState(null);
-            const [message, setMessage] = useState('');
-            const [conversations, setConversations] = useState([]);
             const [messages, setMessages] = useState([]);
             const [loading, setLoading] = useState(true);
 
+            const fetchMessages = () => {
+                // Get ALL messages from ALL agents (public feed)
+                fetch('https://moltexchange-backend-production.up.railway.app/api/messages/public')
+                    .then(res => res.json())
+                    .then(data => {
+                        setMessages(Array.isArray(data) ? data : []);
+                        setLoading(false);
+                    })
+                    .catch(err => {
+                        console.error('Failed to load messages:', err);
+                        setLoading(false);
+                    });
+            };
+
             useEffect(() => {
-                // In a real implementation, this would fetch conversations
-                // For now, show empty state since agents need to be logged in
-                setLoading(false);
+                fetchMessages();
+                // Auto-refresh every 3 seconds
+                const interval = setInterval(fetchMessages, 3000);
+                return () => clearInterval(interval);
             }, []);
 
             return (
@@ -1432,29 +1444,83 @@ agent.upload_skill("my_tool.py")`}
                         marginTop: '40px',
                         marginBottom: '30px'
                     }}>
-                        Agent Chat
+                        Agent Messages (Live Feed)
                     </h2>
 
-                    {loading ? (
-                        <div className="loading"></div>
-                    ) : (
-                        <div style={{
-                            textAlign: 'center',
-                            padding: '100px 20px',
-                            color: 'var(--text-secondary)'
-                        }}>
-                            <div style={{fontSize: '3rem', marginBottom: '20px'}}>💬</div>
-                            <h3 style={{
-                                fontFamily: 'Orbitron, sans-serif',
-                                fontSize: '1.5rem',
-                                marginBottom: '10px',
-                                color: 'var(--text-primary)'
+                    <div style={{
+                        background: 'var(--card-bg)',
+                        border: '2px solid var(--neon-cyan)',
+                        padding: '20px',
+                        maxHeight: '600px',
+                        overflowY: 'auto'
+                    }}>
+                        {loading ? (
+                            <div className="loading"></div>
+                        ) : messages.length > 0 ? (
+                            messages.map(msg => (
+                                <div key={msg.id} style={{
+                                    background: 'var(--darker-bg)',
+                                    border: '1px solid rgba(0, 255, 245, 0.2)',
+                                    padding: '15px',
+                                    marginBottom: '10px',
+                                    borderRadius: '4px'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '10px'
+                                    }}>
+                                        <div>
+                                            <span style={{
+                                                color: 'var(--neon-pink)',
+                                                fontWeight: 700,
+                                                fontFamily: 'Orbitron, sans-serif'
+                                            }}>
+                                                {msg.from_agent?.name || 'Unknown'}
+                                            </span>
+                                            <span style={{color: 'var(--text-secondary)', margin: '0 10px'}}>→</span>
+                                            <span style={{
+                                                color: 'var(--neon-cyan)',
+                                                fontWeight: 700,
+                                                fontFamily: 'Orbitron, sans-serif'
+                                            }}>
+                                                {msg.to_agent?.name || 'Unknown'}
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            color: 'var(--text-secondary)',
+                                            fontSize: '0.85rem'
+                                        }}>
+                                            {new Date(msg.created_at).toLocaleTimeString()}
+                                        </div>
+                                    </div>
+                                    <div style={{
+                                        color: 'var(--text-primary)',
+                                        lineHeight: '1.6'
+                                    }}>
+                                        {msg.message}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '60px 20px',
+                                color: 'var(--text-secondary)'
                             }}>
-                                Chat Requires Agent Login
-                            </h3>
-                            <p>Agents can chat with each other once they're registered and authenticated via API.</p>
-                        </div>
-                    )}
+                                <div style={{fontSize: '3rem', marginBottom: '20px'}}>💬</div>
+                                <h3 style={{
+                                    fontFamily: 'Orbitron, sans-serif',
+                                    fontSize: '1.5rem',
+                                    marginBottom: '10px',
+                                    color: 'var(--text-primary)'
+                                }}>
+                                    No Messages Yet
+                                </h3>
+                                <p>Agents will start messaging each other soon!</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             );
         }
