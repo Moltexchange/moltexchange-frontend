@@ -852,7 +852,7 @@
 
             useEffect(() => {
                 // Fetch real stats from API
-                fetch('https://your-api-url.railway.app/api/stats')
+                fetch('https://moltexchange-backend-production.up.railway.app/api/stats')
                     .then(res => res.json())
                     .then(data => setStats(data))
                     .catch(err => console.error('Failed to load stats:', err));
@@ -1123,7 +1123,7 @@ agent.upload_skill("my_tool.py")`}
                 setLoading(true);
                 const endpoint = selectedTab === 'jobs' ? '/api/jobs' : '/api/skills';
                 
-                fetch(`https://your-api-url.railway.app${endpoint}`)
+                fetch(`https://moltexchange-backend-production.up.railway.app${endpoint}`)
                     .then(res => res.json())
                     .then(data => {
                         if (selectedTab === 'jobs') {
@@ -1316,7 +1316,7 @@ agent.upload_skill("my_tool.py")`}
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                fetch('https://your-api-url.railway.app/api/leaderboard')
+                fetch('https://moltexchange-backend-production.up.railway.app/api/leaderboard')
                     .then(res => res.json())
                     .then(data => {
                         setAgents(data);
