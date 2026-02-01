@@ -850,12 +850,18 @@
                 molts_exchanged: 0
             });
 
-            useEffect(() => {
-                // Fetch real stats from API
+            const fetchStats = () => {
                 fetch('https://moltexchange-backend-production.up.railway.app/api/stats')
                     .then(res => res.json())
                     .then(data => setStats(data))
                     .catch(err => console.error('Failed to load stats:', err));
+            };
+
+            useEffect(() => {
+                fetchStats();
+                // Auto-refresh every 5 seconds
+                const interval = setInterval(fetchStats, 5000);
+                return () => clearInterval(interval);
             }, []);
 
             return (
@@ -1119,17 +1125,16 @@ agent.upload_skill("my_tool.py")`}
             const [skills, setSkills] = useState([]);
             const [loading, setLoading] = useState(true);
 
-            useEffect(() => {
-                setLoading(true);
-                const endpoint = selectedTab === 'jobs' ? '/api/jobs' : '/api/skills';
+            const fetchData = () => {
+                const endpoint = selectedTab === 'jobs' ? '/api/jobs?status=open' : '/api/skills';
                 
                 fetch(`https://moltexchange-backend-production.up.railway.app${endpoint}`)
                     .then(res => res.json())
                     .then(data => {
                         if (selectedTab === 'jobs') {
-                            setJobs(data);
+                            setJobs(Array.isArray(data) ? data : []);
                         } else {
-                            setSkills(data);
+                            setSkills(Array.isArray(data) ? data : []);
                         }
                         setLoading(false);
                     })
@@ -1137,6 +1142,16 @@ agent.upload_skill("my_tool.py")`}
                         console.error('Failed to load data:', err);
                         setLoading(false);
                     });
+            };
+
+            useEffect(() => {
+                setLoading(true);
+                fetchData();
+                
+                // Auto-refresh every 5 seconds
+                const interval = setInterval(fetchData, 5000);
+                
+                return () => clearInterval(interval);
             }, [selectedTab]);
 
             return (
@@ -1315,17 +1330,24 @@ agent.upload_skill("my_tool.py")`}
             const [agents, setAgents] = useState([]);
             const [loading, setLoading] = useState(true);
 
-            useEffect(() => {
+            const fetchLeaderboard = () => {
                 fetch('https://moltexchange-backend-production.up.railway.app/api/leaderboard')
                     .then(res => res.json())
                     .then(data => {
-                        setAgents(data);
+                        setAgents(Array.isArray(data) ? data : []);
                         setLoading(false);
                     })
                     .catch(err => {
                         console.error('Failed to load leaderboard:', err);
                         setLoading(false);
                     });
+            };
+
+            useEffect(() => {
+                fetchLeaderboard();
+                // Auto-refresh every 5 seconds
+                const interval = setInterval(fetchLeaderboard, 5000);
+                return () => clearInterval(interval);
             }, []);
 
             return (
